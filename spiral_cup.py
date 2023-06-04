@@ -38,7 +38,7 @@ def square(layer_height, radius, bump_height, bump_width, offset):
             
         v += offset
 
-def triangle():
+def triangle(layer_height, radius, bump_height, bump_width, offset):
     v = 1
     for k in range (0, layer_height):
         i = 0
@@ -51,15 +51,25 @@ def triangle():
                 # make a bump
                 t.right(60)
                 t.forward(bump_height)
-                i += bump_width - 1
                 t.left(120)
                 t.forward(bump_height)
                 t.right(120)
+                i += bump_width - 1
                 continue
             i += 1
         v += offset
-        
-def loop():
+
+# def bump(layer_height, radius, bump_height, bump_width, offset, shape_type):
+#     if shape_type == 0:
+#         square(layer_height, radius, bump_height, bump_width, offset)
+#     elif shape_type == 1:
+#         triangle(layer_height, radius, bump_height, bump_width, offset)
+#     elif shape_type == 2:
+#         loop(layer_height, radius, bump_height, bump_width, offset)
+#     else:
+#         print(f'Invalid shape_type: {shape_type}')
+
+def loop(layer_height, radius, bump_height, bump_width, offset):
     v = 1
     for k in range (0, layer_height):
         i = 0
@@ -71,9 +81,8 @@ def loop():
             if i==v:
                 # make a bump
                 t.right(45)
-                t.forward(2 * bump_height)
-                # t.right(90)
-                
+                t.forward(math.sqrt(2) * bump_height)
+                t.right(90)               
                 r_prime = radius + bump_height
                 for j in range (0, bump_width):
                     x = r_prime * math.cos(math.radians(i-j))
@@ -81,7 +90,7 @@ def loop():
                     t.set_position(x, y)
                 i += bump_width + 1
                 t.right(135)
-                t.forward(2 * bump_height)
+                t.forward(math.sqrt(2) * bump_height)
                 t.right(90)
                 continue
             i += 1  
