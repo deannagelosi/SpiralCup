@@ -13,13 +13,13 @@ class SpiralCup:
         # lines = self.t.get_lines()
 
     def bump(self, layer_height, radius, bump_height, bump_width, offset, shape_type):
-        if shape_type == 0:
+        if shape_type == "Square":
             lines = self.square(layer_height, radius, bump_height, bump_width, offset)
             return lines 
-        elif shape_type == 1:
+        elif shape_type == "Triangle":
             lines = self.triangle(layer_height, radius, bump_height, bump_width, offset)
             return lines 
-        elif shape_type == 2:
+        elif shape_type == "Loop":
             lines = self.loop(layer_height, radius, bump_height, bump_width, offset)
             return lines 
         else:
