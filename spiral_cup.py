@@ -3,14 +3,27 @@ import Rhino.Geometry as geom
 import math
 from extruder_turtle import ExtruderTurtle
 
-# to do
-# - vary spacing between bumps (every bump, second bump, fourth, etc)
-# - dynamically scale the number of bumps
+# Grasshopper Python Script Editor code
+#
+# import rhinoscriptsyntax as rs
+# import sys
+# import operator as op
+# from spiral_cup import SpiralCup   # file
+
+# to_delete = list()
+# for module in sys.modules:
+#     if "spiral_cup" in module:
+#       to_delete.append(module)
+# for module in to_delete:
+#     sys.modules.pop(module)
+
+# s = SpiralCup()
+
+# lines = s.bump(layer_height, radius, bump_height, bump_width, offset, shape_type)
 
 class SpiralCup:
     def __init__(self):
         self.t = ExtruderTurtle() # print lines
-        # lines = self.t.get_lines()
 
     def bump(self, layer_height, radius, bump_height, bump_width, offset, shape_type):
         if shape_type == "Square":
