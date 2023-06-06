@@ -1,7 +1,6 @@
 import rhinoscriptsyntax as rs
 import Rhino.Geometry as geom
 import math
-from extruder_turtle import ExtruderTurtle
 
 # Grasshopper Python Script Editor code
 #
@@ -22,21 +21,20 @@ from extruder_turtle import ExtruderTurtle
 # lines = s.bump(layer_height, radius, bump_height, bump_width, offset, shape_type)
 
 class SpiralCup:
-    def __init__(self):
-        self.t = ExtruderTurtle() # print lines
+    def __init__(self, t):
+        self.t = t
 
     def bump(self, layer_height, radius, bump_height, bump_width, offset, shape_type):
         if shape_type == "Square":
-            lines = self.square(layer_height, radius, bump_height, bump_width, offset)
-            return lines 
+            self.square(layer_height, radius, bump_height, bump_width, offset) 
         elif shape_type == "Triangle":
-            lines = self.triangle(layer_height, radius, bump_height, bump_width, offset)
-            return lines 
+            self.triangle(layer_height, radius, bump_height, bump_width, offset)
         elif shape_type == "Loop":
-            lines = self.loop(layer_height, radius, bump_height, bump_width, offset)
-            return lines 
+            self.loop(layer_height, radius, bump_height, bump_width, offset)
         else:
             print("Invalid shape_type: " + str(shape_type))
+
+        return self.t
 
     def square(self, layer_height, radius, bump_height, bump_width, offset):
         v = 1
@@ -63,10 +61,7 @@ class SpiralCup:
                     self.t.right(90)
                     continue
                 i += 1  
-                
             v += offset
-        lines = self.t.get_lines()
-        return lines
             
     def triangle(self, layer_height, radius, bump_height, bump_width, offset):
         v = 1
@@ -88,8 +83,6 @@ class SpiralCup:
                     continue
                 i += 1
             v += offset
-        lines = self.t.get_lines()
-        return lines
 
     def loop(self, layer_height, radius, bump_height, bump_width, offset):
         v = 1
@@ -117,5 +110,3 @@ class SpiralCup:
                     continue
                 i += 1  
             v += offset
-        lines = self.t.get_lines()
-        return lines
