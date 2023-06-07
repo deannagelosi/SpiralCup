@@ -2,6 +2,9 @@ import rhinoscriptsyntax as rs
 import Rhino.Geometry as geom
 import math
 
+# sources:
+#  - https://dev.to/taarimalta/how-to-draw-a-spiral-with-python-turtle-2n5c
+
 # To Do
 # - bumps along the full height of the shape
 
@@ -34,8 +37,38 @@ class SpiralCup:
     def __init__(self, t):
         self.t = t
 
+    def spiral_bottom(self, radius, extrude_width, increment_angle=1):
+        angle = 0
+        total_rotations = radius / extrude_width  # total rotations in the spiral
+
+        while angle <= 360 * total_rotations: # keep going until we've done the total rotations
+            curr_radius = angle * extrude_width / 360  # current radius based on angle
+            x = curr_radius * math.cos(math.radians(angle))
+            y = curr_radius * math.sin(math.radians(angle))
+            self.t.set_position(x, y)
+            angle += increment_angle
+
+        while x <= radius:
+            curr_radius = angle * extrude_width / 360  # current radius based on angle
+            x = curr_radius * math.cos(math.radians(angle))
+            y = curr_radius * math.sin(math.radians(angle))
+            self.t.set_position(x, y)
+            angle += increment_angle
+
+        curr_x = x
+        curr_y = y
+
+        return curr_x, curr_y
+
     def bump(self, layer_height, radius, bump_height, bump_width, offset, shape_type):
+        # Create spiral and get its last position
+        curr_x, curr_y = self.spiral_bottom(radius, self.t.get_extrude_width())
+
+        # Set the position to the last position of the spiral
+        self.t.set_position(x = curr_x, y = curr_y)
+
         if shape_type == "Square":
+            # self.spiral_bottom(radius, extrude_width)
             self.square(layer_height, radius, bump_height, bump_width, offset) 
         elif shape_type == "Triangle":
             self.triangle(layer_height, radius, bump_height, bump_width, offset)
