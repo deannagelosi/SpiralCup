@@ -2,11 +2,16 @@ import rhinoscriptsyntax as rs
 import Rhino.Geometry as geom
 import math
 
+# To Do
+# - bumps along the full height of the shape
+
 # Grasshopper Python Script Editor code
 #
 # import rhinoscriptsyntax as rs
 # import sys
 # import operator as op
+# import extruder_turtle
+# from extruder_turtle import *
 # from spiral_cup import SpiralCup   # file
 
 # to_delete = list()
@@ -15,10 +20,15 @@ import math
 #       to_delete.append(module)
 # for module in to_delete:
 #     sys.modules.pop(module)
+    
+# t = ExtruderTurtle()
+# # t.setup(filename=filename)
 
-# s = SpiralCup()
+# s = SpiralCup(t)
+# t = s.bump(layer_height, radius, bump_height, bump_width, offset, shape_type)
 
-# lines = s.bump(layer_height, radius, bump_height, bump_width, offset, shape_type)
+# lines = t.get_lines()
+# t.finish()
 
 class SpiralCup:
     def __init__(self, t):
@@ -44,7 +54,9 @@ class SpiralCup:
                 x = radius * math.cos(math.radians(i))
                 y = radius * math.sin(math.radians(i))
                 self.t.set_position(x, y)
-                self.t.lift(0.01)
+                layer_height = self.t.get_layer_height()
+                lift = layer_height / 360.0
+                self.t.lift(lift)
                 if i==v:
                     # make a bump
                     self.t.right(90)
@@ -71,7 +83,9 @@ class SpiralCup:
                 x = radius * math.cos(math.radians(i))
                 y = radius * math.sin(math.radians(i))
                 self.t.set_position(x, y)
-                self.t.lift(0.01)
+                layer_height = self.t.get_layer_height()
+                lift = layer_height / 360.0
+                self.t.lift(lift)
                 if i==v:
                     # make a bump
                     self.t.right(60)
@@ -92,7 +106,9 @@ class SpiralCup:
                 x = radius * math.cos(math.radians(i))
                 y = radius * math.sin(math.radians(i))
                 self.t.set_position(x, y)
-                self.t.lift(0.01)
+                layer_height = self.t.get_layer_height()
+                lift = layer_height / 360.0
+                self.t.lift(lift)
                 if i==v:
                     # make a bump
                     self.t.right(45)
