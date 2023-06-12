@@ -10,16 +10,25 @@ class SpiralCup:
         self.t = t
 
     def bump(self, layer_height, radius, bump_height, bump_width, offset, shape_type):                
+        bottom_lift = 1.6 # as of Friday 7/9, last tested on 1.2
+        # print(bottom_lift)
+        
         # Create spiral outwards and get its last position
         curr_x, curr_y = self.spiral_bottom(radius, self.t.get_extrude_width())
-        self.t.lift(self.t.get_layer_height())
+        self.t.lift(bottom_lift)
+        # print(self.t.get_layer_height())
+
+        # Offset for the second layer
+        self.t.left(90)
+        radial_offset = self.t.get_extrude_width() / 2
+        self.t.forward(radial_offset)
+        # self.t.left(90)
 
         # Calculate offset angle for the second layer
         increment_angle = -1  # change direction of spiral
         extrude_width = self.t.get_extrude_width()
-        offset_angle = (extrude_width / 2) * 360 / radius
-        curr_x, curr_y = self.spiral_bottom(radius, extrude_width, increment_angle, offset_angle)
-        self.t.lift(self.t.get_layer_height())
+        curr_x, curr_y = self.spiral_bottom(radius - radial_offset, extrude_width, increment_angle, 0)
+        self.t.lift(bottom_lift)
 
         # Third pass similar to first pass, spiraling outwards
         increment_angle = 1
@@ -40,30 +49,30 @@ class SpiralCup:
 
         self.spiral(radius, shape_object, offset, layer_height)
 
-
     def spiral_bottom(self, radius, extrude_width, increment_angle=1, start_angle=0):
         angle = start_angle
         total_rotations = radius / extrude_width  # total rotations in the spiral
 
-        if increment_angle > 0:  # spiraling outwards
-            x = 0
-            y = 0
-        else:  # spiraling inwards
+        # If spiraling inwards
+        if increment_angle < 0:  
             x = radius
+            y = 0
+        else:  # spiraling outwards
+            x = 0
             y = 0
 
         while True:
-            # If not, continue with the spiral
+            # Continue with the spiral
             curr_radius = abs(angle) * extrude_width / 360  # current radius based on angle
 
-            # For spiraling inwards, we have to reduce the radius as angle increases
+            # For spiraling inwards, reduce the radius as angle increases
             if increment_angle < 0:
                 curr_radius = radius - curr_radius
 
             x = curr_radius * math.cos(math.radians(angle))
             y = curr_radius * math.sin(math.radians(angle))
             self.t.set_position(x, y)
-            
+                
             # Check if we've met the conditions to stop
             if increment_angle > 0:  # spiraling outwards
                 if (x >= radius and y <= 0) and angle >= 360 * total_rotations:
