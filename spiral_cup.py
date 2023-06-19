@@ -61,7 +61,10 @@ class SpiralCup:
             x = 0
             y = 0
 
-        while True:
+        max_angle_position_reached = False
+        min_angle_position_reached = False
+
+        while not (max_angle_position_reached or min_angle_position_reached):
             # Continue with the spiral
             curr_radius = abs(angle) * extrude_width / 360  # current radius based on angle
 
@@ -72,54 +75,38 @@ class SpiralCup:
             x = curr_radius * math.cos(math.radians(angle))
             y = curr_radius * math.sin(math.radians(angle))
             self.t.set_position(x, y)
-                
-            # Check if we've met the conditions to stop
-            if increment_angle > 0:  # spiraling outwards
-                if (x >= radius and y <= 0) and angle >= 360 * total_rotations:
-                    break
-            else:  # spiraling inwards
-                if (x <= 0 and y >= 0) and angle <= -360 * total_rotations:
-                    break
 
+            max_angle_position_reached = increment_angle > 0 and x >= radius and y <= 0 and angle >= 360 * total_rotations
+            min_angle_position_reached = increment_angle <= 0 and x <= 0 and y >= 0 and angle <= -360 * total_rotations
+                
             angle += increment_angle
 
         return x, y
 
     def spiral(self, radius, shape_object, offset, layer_height):
-        v = 1
-        for k in range (0, layer_height):
-            i = 0
-            while i < 360:
-                x = radius * math.cos(math.radians(i))
-                y = radius * math.sin(math.radians(i))
-                self.t.set_position(x, y)
-                layer_height = self.t.get_layer_height()
-                lift = layer_height / 360.0
-                self.t.lift(lift)
-                if i==v:
-                    i += shape_object.generate(i)
-                    continue
+        i = 0
+        while i < 360 * layer_height:
+            x = radius * math.cos(math.radians(i))
+            y = radius * math.sin(math.radians(i))
+            self.t.set_position(x, y)
+            lift = self.t.get_layer_height() / 360.0
+            self.t.lift(lift)
+            if i % offset == 0:
+                i += shape_object.generate(i)
+            else:
                 i += 1  
-            v += offset
-
         return self.t
 
-# class Shape:
-#     def __init__(self, t, bump_height, bump_width):
-#         print("Shape called")
-#         print(t, bump_height, bump_width)
-#         self.t = t
-#         self.bump_height = bump_height
-#         self.bump_width = bump_width
-
-class Triangle():
+class Shape:
     def __init__(self, t, bump_height, bump_width):
-        # super().__init__(t, bump_height, bump_width)
         self.t = t
         self.bump_height = bump_height
         self.bump_width = bump_width
-        
 
+class Triangle(Shape):
+    def __init__(self, t, bump_height, bump_width):
+        Shape.__init__(self, t, bump_height, bump_width)
+        
     def generate(self, i):
         self.t.right(60)
         self.t.forward(self.bump_height)
@@ -129,13 +116,10 @@ class Triangle():
 
         return self.bump_width - 1
 
-class Loop():
+class Loop(Shape):
     def __init__(self, t, bump_height, bump_width, radius):
-        # super().__init__(t, bump_height, bump_width)
+        Shape.__init__(self, t, bump_height, bump_width)
         self.radius = radius
-        self.t = t
-        self.bump_height = bump_height
-        self.bump_width = bump_width
 
     def generate(self, i):
         self.t.right(45)
@@ -152,13 +136,10 @@ class Loop():
 
         return self.bump_width + 1
     
-class Square():
+class Square(Shape):
     def __init__(self, t, bump_height, bump_width, radius):
-        # super().__init__(t, bump_height, bump_width)
+        Shape.__init__(self, t, bump_height, bump_width)
         self.radius = radius
-        self.t = t
-        self.bump_height = bump_height
-        self.bump_width = bump_width
     
     def generate(self, i):
         self.t.right(90)
