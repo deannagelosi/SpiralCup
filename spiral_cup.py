@@ -10,6 +10,8 @@ class SpiralCup:
         self.t = t
 
     def bump(self, layer_height, radius, bump_height, bump_width, offset, shape_type):                
+        offset += 360
+        
         bottom_lift = 1.6 # as of Friday 7/9, last tested on 1.2
         # print(bottom_lift)
         
@@ -102,6 +104,15 @@ class Shape:
         self.t = t
         self.bump_height = bump_height
         self.bump_width = bump_width
+
+class Polygon(Shape):
+    def __init__(self, t, num_sides, side_length):
+        self.t = t
+        self.num_sides = num_sides
+        self.side_length = side_length
+    
+    def generate(self, i):
+        pass
 
 class Triangle(Shape):
     def __init__(self, t, bump_height, bump_width):
