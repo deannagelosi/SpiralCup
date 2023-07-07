@@ -9,7 +9,7 @@ class SpiralCup:
     def __init__(self, t):
         self.t = t
 
-    def bump(self, layer_height, radius, bump_height, bump_width, offset, shape_type):                
+    def bump(self, layer_height, radius, bump_height, bump_width, offset, shape_type, num_sides, side_length):                
         offset += 360
         
         bottom_lift = 1.6 # as of Friday 7/9, last tested on 1.2
@@ -39,13 +39,20 @@ class SpiralCup:
         # Set the position to the last position of the spiral
         self.t.set_position(x = curr_x, y = curr_y)
 
+        print("side_length: " + str(side_length))
+        print("radius: " + str(radius))
+
         shape_object = None
         if shape_type == "Triangle":
             shape_object = Triangle(self.t, bump_height, bump_width)
-        elif shape_type == "Loop":
-            shape_object = Loop(self.t, bump_height, bump_width, radius)
+        elif shape_type == "SimpleLoop":
+            shape_object = SimpleLoop(self.t, bump_height, bump_width, radius)
         elif shape_type == "Square":
             shape_object = Square(self.t, bump_height, bump_width, radius)
+        elif shape_type == "Polygon":
+            shape_object = Polygon(self.t, num_sides, side_length, radius)
+        elif shape_type == "Loop":
+            shape_object = Loop(self.t)
         else:
             raise ValueError("Invalid shape_type: " + shape_type)
 
@@ -105,15 +112,52 @@ class Shape:
         self.bump_height = bump_height
         self.bump_width = bump_width
 
+class Loop(Shape):
+    def __init__(self, t):
+        self.t = t
+    
+    def generate (self, i):
+        turn_velocity = 1 # turn_accel
+        turn_amount = 0 # turn_velocity
+        step = 1
+        while turn_amount < 180:
+            self.t.forward(step)
+            self.t.right(turn_amount) # keep track of compounded velocity
+            turn_amount += turn_velocity
+        while turn_amount < 360:
+            self.t.forward(step)
+            self.t.right(turn_amount)
+            turn_amount -= turn_velocity
+
+        return 0
+
+
 class Polygon(Shape):
-    def __init__(self, t, num_sides, side_length):
+    def __init__(self, t, num_sides, side_length, radius):
         self.t = t
         self.num_sides = num_sides
         self.side_length = side_length
+        self.radius = radius
     
     def generate(self, i):
-        pass
+        interior_angle = (180 * (self.num_sides - 2)) / self.num_sides
+        exterior_angle = 180 - interior_angle
 
+        self.t.right(interior_angle)
+        print("right: " + str(interior_angle))
+        self.t.forward(self.side_length)
+        print("forward: " + str(self.side_length))
+        for sides in range(self.num_sides - 2):
+            self.t.left(exterior_angle)
+            print("left: " + str(exterior_angle))
+            self.t.forward(self.side_length)
+
+        central_angle = math.degrees(self.side_length / self.radius)
+        print("central_angle: " + str(central_angle))
+
+        
+        return int(central_angle)
+        
 class Triangle(Shape):
     def __init__(self, t, bump_height, bump_width):
         Shape.__init__(self, t, bump_height, bump_width)
@@ -123,11 +167,11 @@ class Triangle(Shape):
         self.t.forward(self.bump_height)
         self.t.left(120)
         self.t.forward(self.bump_height)
-        self.t.right(120)
+        # self.t.right(120)
 
         return self.bump_width - 1
 
-class Loop(Shape):
+class SimpleLoop(Shape):
     def __init__(self, t, bump_height, bump_width, radius):
         Shape.__init__(self, t, bump_height, bump_width)
         self.radius = radius
