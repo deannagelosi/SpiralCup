@@ -131,7 +131,6 @@ class Loop(Shape):
 
         return 0
 
-
 class Polygon(Shape):
     def __init__(self, t, num_sides, side_length, radius):
         self.t = t
