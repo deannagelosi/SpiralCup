@@ -103,7 +103,7 @@ class SpiralCup:
             if i % offset == 0:
                 i += shape_object.generate(i)
             else:
-                i += 1  
+                i += 1
         return self.t
 
 class Shape:
