@@ -154,7 +154,6 @@ class Polygon(Shape):
         central_angle = math.degrees(self.side_length / self.radius)
         print("central_angle: " + str(central_angle))
 
-        
         return int(central_angle)
         
 class Triangle(Shape):
